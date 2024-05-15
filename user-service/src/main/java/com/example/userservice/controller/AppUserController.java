@@ -13,8 +13,8 @@ public class AppUserController {
     private final AppUserService appUserService;
 
     @PostMapping
-    public AppUser add(@RequestBody AppUser appUser) {
-        return appUserService.add(appUser);
+    public AppUser addUser(@RequestBody AppUser appUser) {
+        return appUserService.addUser(appUser);
     }
 
     @GetMapping

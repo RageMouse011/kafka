@@ -3,6 +3,8 @@ package com.example.userservice.service;
 import com.example.userservice.kafka.KafkaProducer;
 import com.example.userservice.model.AppUser;
 import com.example.userservice.repository.AppUserRepository;
+import jakarta.persistence.EntityExistsException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,13 +20,14 @@ public class AppUserService {
     private final AppUserRepository appUserRepository;
     private final KafkaProducer kafkaProducer;
 
-    public AppUser add(AppUser appUser) {
+    @Transactional
+    public AppUser addUser(AppUser appUser) {
 
         AppUser user;
         Optional<AppUser> userByUserNameOpt = appUserRepository.findAppUserByUsername(appUser.getUsername());
 
         if (userByUserNameOpt.isPresent()) {
-            throw new IllegalArgumentException("This username is already in use");
+            throw new EntityExistsException("This username is already in use");
         } else {
             user = appUserRepository.save(appUser);
             kafkaProducer.sendUserTopic(user.getUsername());
